@@ -6,8 +6,52 @@
 
 #ifndef _SETTINGS_h
 #define _SETTINGS_h
-#define MAX_SCHEDULES 10
-#define NUM_ZONES 15
+
+// If you're looking for the user settings #defines they have been moved to config.h
+#include "config.h"
+
+// EEPROM Memory locations
+#define ADDR_SCHEDULE_COUNT		4
+#define ADDR_OP1				5
+#define END_OF_ZONE_BLOCK		950
+#define END_OF_SCHEDULE_BLOCK	2048
+#define ADDR_NTP_IP				950
+#define ADDR_NTP_OFFSET			954
+#define ADDR_HOST				955 // NOT USED
+#define MAX_HOST_LEN			20  // NOT USED
+#define ADDR_IP					976
+#define ADDR_NETMASK			980
+#define ADDR_GATEWAY			984
+#define ADDR_DHCP				988 // NOT USED
+#define ADDR_WUIP				992
+#define ADDR_ZIP				996
+#define ADDR_APIKEY				1000
+#define ADDR_OTYPE				1008
+#define ADDR_WEB				1009
+#define ADDR_SADJ				1011
+#define ADDR_PWS				1012
+#define LEN_PWS					11
+#define ADDR_APIID				1023
+#define LEN_APIID				32
+#define ADDR_APISECRET			1055
+#define LEN_APISECRET			64
+#define ADDR_LOC				1119
+#define LEN_LOC					50
+#define ADDR_					1169
+
+#define SCHEDULE_OFFSET 1200
+#define SCHEDULE_INDEX 60
+#define ZONE_OFFSET 20
+#define ZONE_INDEX 25
+
+#if ZONE_OFFSET + (ZONE_INDEX * NUM_ZONES) > END_OF_ZONE_BLOCK
+#error Number of Zones is too large
+#endif
+
+#if SCHEDULE_OFFSET + (SCHEDULE_INDEX * MAX_SCHEDULES) > END_OF_SCHEDULE_BLOCK
+#error Number of Schedules is too large
+#endif
+
 #include <inttypes.h>
 #include <string.h>
 
@@ -32,10 +76,24 @@ public:
 	bool IsEnabled() const { return m_type & 0x01; }
 	bool IsInterval() const { return m_type & 0x02; }
 	bool IsWAdj() const { return m_type & 0x04; }
+	bool IsRestricted() const { return m_type & 0x08; }
+	uint8_t GetRestriction() const {
+		if (IsRestricted()) {
+			if (m_type & 0x10) {
+				return 2;
+			} else {
+				return 1;
+			}
+		}
+		return 0;
+	}
 	bool IsRunToday(time_t time_now) {
-		if ((IsEnabled())
-			&& (((IsInterval()) && ((elapsedDays(time_now) % interval) == 0))
-				|| (!(IsInterval()) && (day & (0x01 << (weekday(time_now) - 1))))))
+		uint8_t restrictions = GetRestriction();
+		if ((IsEnabled())	// do nothing if not enabled
+			&& (((IsInterval()) && ((elapsedDays(time_now) % interval) == 0))	// if interval is enabled, check days since last run
+				|| (!(IsInterval())
+					&& ((restrictions == 0) || ((mday(time_now)%2) == (restrictions%2)))	// if even/odd restrictions are enabled check day of month number
+					&& (day & (0x01 << (weekday(time_now) - 1))))))	// if day of week schedule check day of week
 			return true;
 		return false;
 	}
@@ -49,12 +107,19 @@ public:
 			return sprintf(str, "n/a");
 		}
 		if (!IsRunToday(time_now) && !IsRunTomorrow(time_now)) {
-			return sprintf(str, "2+ days");
+			int days = 2;
+			while (days <= 14 && !IsRunToday(time_now + (SECS_PER_DAY*days))) {
+				days++;
+			}
+			if (days > 14) {
+				return sprintf(str, "In 14+ days @ %s", scheduledTimes);
+			}
+			return sprintf(str, "In %d days @ %s", days, scheduledTimes);
 		}
 
-		return sprintf(str, "%s %s",
-				 IsRunToday(time_now) ? "Today" : "Tomorrow",
-				 scheduledTimes);
+		return sprintf(str, "%s @ %s",
+					   IsRunToday(time_now) ? "Today" : "Tomorrow",
+					   scheduledTimes);
 	}
 	int GetEnabledTimes(char* str) {
 		if (!IsEnabled()) {
@@ -62,12 +127,12 @@ public:
 		}
 		char buff[10];
 		int h;
-        short x;
+		short x;
 		bool enabled = false;
-        str[0] = '\0';
+		str[0] = '\0';
 
 		for (int i=0; i<4; i++) {
-            x = time[i];
+			x = time[i];
 			if (x != -1) {
 				if (enabled) {
 					strcat(str, ", ");
@@ -76,9 +141,9 @@ public:
 				}
 				h = x/60;
 				sprintf(buff, "%d:%.2d %s",
-						 (h%12 == 0 ? 12 : h%12),
-						 x%60,
-						 (h < 12 ? "AM" : "PM"));
+						(h%12 == 0 ? 12 : h%12),
+						x%60,
+						(h < 12 ? "AM" : "PM"));
 				strcat(str, buff);
 			}
 		}
@@ -90,6 +155,15 @@ public:
 	void SetEnabled(bool val) { m_type = val ? (m_type | 0x01) : (m_type & ~0x01); }
 	void SetInterval(bool val) { m_type = val ? (m_type | 0x02) : (m_type & ~0x02); }
 	void SetWAdj(bool val) { m_type = val ? (m_type | 0x04) : (m_type & ~0x04); }
+	void SetRestriction(uint8_t val) {
+		if (val == 1) {
+			m_type = (m_type | 0x08) & ~0x10;
+		} else if (val == 2) {
+			m_type = (m_type | 0x18);
+		} else {
+			m_type = (m_type & ~0x18);
+		}
+	}
 };
 
 struct FullZone
@@ -125,6 +199,10 @@ uint32_t GetZip();
 void SetZip(const uint32_t zip);
 void GetApiKey(char * key);
 void SetApiKey(const char * key);
+void GetApiId(char * key);
+void SetApiId(const char * key);
+void GetApiSecret(char * key);
+void SetApiSecret(const char * key);
 bool GetRunSchedules();
 void SetRunSchedules(bool value);
 bool GetDHCP();
@@ -138,6 +216,8 @@ uint8_t GetSeasonalAdjust();
 void SetSeasonalAdjust(uint8_t);
 void GetPWS(char * key);
 void SetPWS(const char * key);
+void GetLoc(char * key);
+void SetLoc(const char * key);
 bool GetUsePWS();
 void SetUsePWS(bool value);
 void LoadSchedule(uint8_t num, Schedule * pSched);

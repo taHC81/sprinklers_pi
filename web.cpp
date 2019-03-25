@@ -10,12 +10,23 @@
 #include "nntp.h"
 #endif
 
+#if defined(WEATHER_WUNDERGROUND)
+#include "Wunderground.h"
+#elif defined(WEATHER_AERIS)
+#include "Aeris.h"
+#elif defined(WEATHER_DARKSKY)
+#include "DarkSky.h"
+#else
 #include "Weather.h"
+#endif
+
 #include "sysreset.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "Event.h"
+#include <unistd.h>
+#include "core.h"
 
 web::web(void)
 		: m_server(0)
@@ -179,7 +190,7 @@ static void JSONLogs(const KVPairs & key_value_pairs, FILE * stream_file)
 		}
 	}
 
-	log.GraphZone(stream_file, sdate, edate, grouping);
+	logger.GraphZone(stream_file, sdate, edate, grouping);
 	fprintf(stream_file, "}");
 }
 
@@ -203,7 +214,7 @@ static void JSONtLogs(const KVPairs & key_value_pairs, FILE * stream_file)
 			edate = strtol(value, 0, 10);
 		}
 	}
-	log.TableZone(stream_file, sdate, edate);
+	logger.TableZone(stream_file, sdate, edate);
 	fprintf(stream_file, "\t]\n}");
 }
 
@@ -213,6 +224,7 @@ static void JSONSettings(const KVPairs & key_value_pairs, FILE * stream_file)
 {
 	ServeHeader(stream_file, 200, "OK", false, "text/plain");
 	IPAddress ip;
+	Weather::Settings settings = Weather::GetSettings();
 	fprintf(stream_file, "{\n");
 #ifdef ARDUINO
 	ip = GetIP();
@@ -229,31 +241,48 @@ static void JSONSettings(const KVPairs & key_value_pairs, FILE * stream_file)
 	fprintf_P(stream_file, PSTR("\t\"ot\" : \"%d\",\n"), GetOT());
 	ip = GetWUIP();
 	fprintf_P(stream_file, PSTR("\t\"wuip\" : \"%d.%d.%d.%d\",\n"), ip[0], ip[1], ip[2], ip[3]);
-	fprintf_P(stream_file, PSTR("\t\"wutype\" : \"%s\",\n"), GetUsePWS() ? "pws" : "zip");
-	fprintf_P(stream_file, PSTR("\t\"zip\" : \"%ld\",\n"), (long) GetZip());
-	fprintf_P(stream_file, PSTR("\t\"sadj\" : \"%ld\",\n"), (long) GetSeasonalAdjust());
-	char ak[17];
-	GetApiKey(ak);
-	fprintf_P(stream_file, PSTR("\t\"apikey\" : \"%s\",\n"), ak);
-	GetPWS(ak);
-	ak[11] = 0;
-	fprintf_P(stream_file, PSTR("\t\"pws\" : \"%s\"\n"), ak);
+#if defined(WEATHER_WUNDERGROUND)
+	fprintf_P(stream_file, PSTR("\t\"apikey\" : \"%s\",\n"), settings.key);
+	fprintf_P(stream_file, PSTR("\t\"wutype\" : \"%s\",\n"), settings.usePws ? "pws" : "zip");
+	fprintf_P(stream_file, PSTR("\t\"zip\" : \"%ld\",\n"), (long) settings.zip);
+	fprintf_P(stream_file, PSTR("\t\"pws\" : \"%s\",\n"), settings.pws);
+#endif
+#if defined(WEATHER_AERIS)
+	fprintf_P(stream_file, PSTR("\t\"apiid\" : \"%s\",\n"), settings.apiId);
+	fprintf_P(stream_file, PSTR("\t\"apisecret\" : \"%s\",\n"), settings.apiSecret);
+	fprintf_P(stream_file, PSTR("\t\"loc\" : \"%s\",\n"), settings.location);
+#endif
+#if defined(WEATHER_DARKSKY)
+	fprintf_P(stream_file, PSTR("\t\"apisecret\" : \"%s\",\n"), settings.apiSecret);
+	fprintf_P(stream_file, PSTR("\t\"loc\" : \"%s\",\n"), settings.location);
+#endif
+	// leave this value last, it has no comma after the value
+	fprintf_P(stream_file, PSTR("\t\"sadj\" : \"%ld\"\n"), (long) GetSeasonalAdjust());
 	fprintf(stream_file, "}");
 }
 
 static void JSONwCheck(const KVPairs & key_value_pairs, FILE * stream_file)
 {
-	Weather w;
+	bool noprovider = false;
 	ServeHeader(stream_file, 200, "OK", false, "text/plain");
-	char key[17];
-	GetApiKey(key);
-	char pws[12] = {0};
-	GetPWS(pws);
-	const Weather::ReturnVals vals = w.GetVals(key, GetZip(), pws, GetUsePWS());
+
+#if defined(WEATHER_WUNDERGROUND)
+	Wunderground w;
+#elif defined(WEATHER_AERIS)
+	Aeris w;
+#elif defined(WEATHER_DARKSKY)
+	DarkSky w;
+#else
+	Weather w;
+	noprovider = true;
+#endif
+
+	const Weather::ReturnVals vals = w.GetVals();
 	const int scale = w.GetScale(vals);
 
 	fprintf(stream_file, "{\n");
 	fprintf_P(stream_file, PSTR("\t\"valid\" : \"%s\",\n"), vals.valid ? "true" : "false");
+	fprintf_P(stream_file, PSTR("\t\"noprovider\" : \"%s\",\n"), noprovider ? "true" : "false");
 	fprintf_P(stream_file, PSTR("\t\"keynotfound\" : \"%s\",\n"), vals.keynotfound ? "true" : "false");
 	fprintf_P(stream_file, PSTR("\t\"resolvedIP\" : \"%s\",\n"), vals.resolvedIP);
 	fprintf_P(stream_file, PSTR("\t\"minhumidity\" : \"%d\",\n"), vals.minhumidity);
@@ -314,8 +343,8 @@ static void JSONSchedule(const KVPairs & key_value_pairs, FILE * stream_file)
 	Schedule sched;
 	LoadSchedule(sched_num, &sched);
 	fprintf_P(stream_file,
-			PSTR("{\n\t\"name\" : \"%s\",\n\t\"enabled\" : \"%s\",\n\t\"wadj\" : \"%s\",\n\t\"type\" : \"%s\",\n\t\"d1\" : \"%s\",\n\t\"d2\" : \"%s\""),
-			sched.name, sched.IsEnabled() ? "on" : "off", sched.IsWAdj() ? "on" : "off", sched.IsInterval() ? "off" : "on", sched.day & 0x01 ? "on" : "off",
+			PSTR("{\n\t\"name\" : \"%s\",\n\t\"restrict\" : \"%d\",\n\t\"enabled\" : \"%s\",\n\t\"wadj\" : \"%s\",\n\t\"type\" : \"%s\",\n\t\"d1\" : \"%s\",\n\t\"d2\" : \"%s\""),
+			sched.name, sched.GetRestriction(), sched.IsEnabled() ? "on" : "off", sched.IsWAdj() ? "on" : "off", sched.IsInterval() ? "off" : "on", sched.day & 0x01 ? "on" : "off",
 			sched.day & 0x02 ? "on" : "off");
 	fprintf_P(stream_file,
 			PSTR(",\n\t\"d3\" : \"%s\",\n\t\"d4\" : \"%s\",\n\t\"d5\" : \"%s\",\n\t\"d6\" : \"%s\",\n\t\"d7\" : \"%s\",\n\t\"interval\" : \"%d\",\n\t\"times\" : [\n"),
@@ -467,9 +496,10 @@ static bool ManualZone(const KVPairs & key_value_pairs)
 {
 	freeMemory();
 
-	// If you uncomment the following line it will
+#ifdef DISABLE_SCHED_ON_MANUAL
     // turn off the current schedules when you use manual control.
-	//SetRunSchedules(false);
+	SetRunSchedules(false);
+#endif
 
 	bool bOn = false;
 	int iZoneNum = -1;
@@ -500,6 +530,42 @@ static bool ManualZone(const KVPairs & key_value_pairs)
 	{
 		TurnOffZones();
 		runState.SetManual(false);
+	}
+	return true;
+}
+
+static bool ChatterZone(const KVPairs & key_value_pairs)
+{
+	freeMemory();
+
+#ifdef DISABLE_SCHED_ON_MANUAL
+    // turn off the current schedules when you use manual control.
+	SetRunSchedules(false);
+#endif
+	
+	int iZoneNum = -1;
+
+	// Iterate through the kv pairs and update the appropriate structure values.
+	for (int i = 0; i < key_value_pairs.num_pairs; i++)
+	{
+		const char * key = key_value_pairs.keys[i];
+		const char * value = key_value_pairs.values[i];
+		if ((strcmp(key, "zone") == 0) && (value[0] == 'z') && (value[1] > 'a') && (value[1] <= ('a' + NUM_ZONES)))
+		{
+			iZoneNum = value[1] - 'a';
+		}
+	}
+	if (iZoneNum >= 0)
+	{
+		for(int i=0;i<CHATTERBOX_CYCLES; i++)
+		{
+			TurnOnZone(iZoneNum);
+			io_latchNow();
+			usleep(CHATTERBOX_DELAY);
+			TurnOffZones();
+			io_latchNow();
+			usleep(CHATTERBOX_DELAY);
+		}
 	}
 	return true;
 }
@@ -847,6 +913,15 @@ void web::ProcessWebClients()
 			else if (strcmp(sPage, "bin/manual") == 0)
 			{
 				if (ManualZone(key_value_pairs))
+				{
+					ServeHeader(pFile, 200, "OK", false);
+				}
+				else
+					ServeError(pFile);
+			}
+			else if (strcmp(sPage, "bin/chatter") == 0)
+			{
+				if (ChatterZone(key_value_pairs))
 				{
 					ServeHeader(pFile, 200, "OK", false);
 				}

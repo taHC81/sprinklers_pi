@@ -53,7 +53,9 @@ EEPROMClass::EEPROMClass()
 	FILE * fd = fopen("settings", "rb");
 	if (!fd)
 		return;
-	fread(m_buf, 1, sizeof(m_buf), fd);
+	auto bytes = fread(m_buf, 1, sizeof(m_buf), fd);
+	if (!bytes)
+		trace("Warning: no bytes read when loading EEPROM.\n");
 	fclose(fd);
 }
 

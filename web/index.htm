@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
+<html lang="en">
   
   <head>
     <title>Main Page</title>
@@ -15,11 +15,46 @@
     <div data-role="page" id="page1">
       <script language="javascript" type="text/javascript">
         var getUpcomingSched = function() {
-          $.ajax("json/schedules", {async: false, dataType: "json", success: function (data) {
+          $.ajax("json/schedules", {dataType: "json", success: function (data) {
             var output = '';
             var found = false;
+
+            data.Table.sort(function(a, b) {
+              if (a.next != 'n/a' && b.next == 'n/a') {
+                return -1;
+              } else if (b.next != 'n/a' && a.next == 'n/a') {
+                return 1;
+              } else if (a.next == 'n/a' && b.next == 'n/a') {
+                return 0;
+              }
+
+              if (a.next.indexOf('Today') != -1) {
+                if (b.next.indexOf('Today') != -1) {
+                  return 0;
+                } else {
+                  return -1;
+                }
+              } else if (b.next.indexOf('Today') != -1) {
+                return 1;
+              }
+
+              if (a.next.indexOf('Tomorrow') != -1) {
+                if (b.next.indexOf('Tomorrow') != -1) {
+                  return 0;
+                } else {
+                  return -1;
+                }
+              } else if (b.next.indexOf('Tomorrow') != -1) {
+                return 1;
+              }
+
+              var aNum = a.next.match(/\d+/)[0];
+              var bNum = b.next.match(/\d+/)[0];
+              return aNum - bNum;
+            });
+
             for (var i = 0; i < data.Table.length; i++) {
-              if (data.Table[i].e == 'on' && (data.Table[i].td || data.Table[i].tm)) {
+              if (data.Table[i].e == 'on' && (data.Table[i].next != 'n/a')) {
                 found = true;
                 output += '<li><a href="ShSched.htm?id=' + data.Table[i].id + '" data-transition="slide">';
                 output += data.Table[i].name;
@@ -49,7 +84,7 @@
           return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
         }
         $('#page1').on('pagebeforeshow', function () {
-          $.ajax("json/state", {async: false, dataType: "json", error: function () { alert ("Communications Failure" ); }, success: function (data) {
+          $.ajax("json/state", {dataType: "json", error: function () { alert ("Communications Failure" ); }, success: function (data) {
             $('#zones_lv').find('span').text(data.zones);
             $('#schedules_lv').find('span').text(data.schedules);
             var dt = new Date(data.timenow*1000);
