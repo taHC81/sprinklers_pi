@@ -49,7 +49,7 @@ static void ParseResponse(EthernetClient & client, Weather::ReturnVals * ret)
 			{
 				recvbufptr = recvbuf;
 				recvbufend = recvbuf + len;
-				trace(recvbuf);
+//				trace(recvbuf);
 			}
 		}
 		char c = *(recvbufptr++);
@@ -200,17 +200,14 @@ Weather::ReturnVals Weather::GetVals(const char * key, uint32_t zip, const char 
 	{
 		char getstring[255];
 		trace(F("Connected\n"));
-				if (usePws)
-			snprintf(getstring, sizeof(getstring), "GET http://%s/api/%s/yesterday/conditions/q/pws:%s.json HTTP/1.1\r\n",m_wundergroundAPIHost, key, pws);
-		else
-			snprintf(getstring, sizeof(getstring), "GET http://%s/api/%s/yesterday/conditions/q/%ld.json HTTP/1.1\r\n",m_wundergroundAPIHost, key, (long) zip);
+		snprintf(getstring, sizeof(getstring), "GET https://%s/%ld.php HTTP/1.1\r\n",m_wundergroundAPIHost, (long) zip);
 
-		trace("GetString:%s\n",getstring);
+//		trace("GetString:%s\n",getstring);
 		client.write((uint8_t*) getstring, strlen(getstring));
 		
 		//send host header
 		snprintf(getstring, sizeof(getstring), "Host: %s\r\nConnection: close\r\n\r\n",m_wundergroundAPIHost);
-		trace("GetString:%s\n",getstring);
+//		trace("GetString:%s\n",getstring);
 		client.write((uint8_t*) getstring, strlen(getstring));
 
 		ParseResponse(client, &vals);
