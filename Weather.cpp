@@ -13,8 +13,7 @@
 
 Weather::Weather(void)
 {
-	 //m_wundergroundAPIHost="api.wunderground.com";
-	 m_wundergroundAPIHost="weather.sitepoint.sk";
+	 m_wundergroundAPIHost="api.wunderground.com";
 }
 
 static void ParseResponse(EthernetClient & client, Weather::ReturnVals * ret)
