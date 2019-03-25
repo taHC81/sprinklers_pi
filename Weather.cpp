@@ -49,7 +49,11 @@ static void ParseResponse(EthernetClient & client, Weather::ReturnVals * ret)
 			{
 				recvbufptr = recvbuf;
 				recvbufend = recvbuf + len;
+<<<<<<< HEAD
 				trace(recvbuf);
+=======
+				//trace(recvbuf);
+>>>>>>> parent of 4e8aef0... Update Weather.cpp
 			}
 		}
 		char c = *(recvbufptr++);
@@ -200,17 +204,29 @@ Weather::ReturnVals Weather::GetVals(const char * key, uint32_t zip, const char 
 	{
 		char getstring[255];
 		trace(F("Connected\n"));
+<<<<<<< HEAD
 				if (usePws)
+=======
+		if (usePws)
+>>>>>>> parent of 4e8aef0... Update Weather.cpp
 			snprintf(getstring, sizeof(getstring), "GET http://%s/api/%s/yesterday/conditions/q/pws:%s.json HTTP/1.1\r\n",m_wundergroundAPIHost, key, pws);
 		else
 			snprintf(getstring, sizeof(getstring), "GET http://%s/api/%s/yesterday/conditions/q/%ld.json HTTP/1.1\r\n",m_wundergroundAPIHost, key, (long) zip);
 
+<<<<<<< HEAD
 		trace("GetString:%s\n",getstring);
+=======
+		//trace("GetString:%s\n",getstring);
+>>>>>>> parent of 4e8aef0... Update Weather.cpp
 		client.write((uint8_t*) getstring, strlen(getstring));
 		
 		//send host header
 		snprintf(getstring, sizeof(getstring), "Host: %s\r\nConnection: close\r\n\r\n",m_wundergroundAPIHost);
+<<<<<<< HEAD
 		trace("GetString:%s\n",getstring);
+=======
+		//trace("GetString:%s\n",getstring);
+>>>>>>> parent of 4e8aef0... Update Weather.cpp
 		client.write((uint8_t*) getstring, strlen(getstring));
 
 		ParseResponse(client, &vals);
