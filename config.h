@@ -28,6 +28,8 @@
 // DarkSky Weather https://darksky.net/dev
 //#define WEATHER_DARKSKY
 
+#define HA
+
 // END WEATHER PROVIDER SECTION
 
 // Set the on/off delay for "ChatterBox" (in microseconds)
