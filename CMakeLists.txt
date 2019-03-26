@@ -32,6 +32,8 @@ add_executable(sprinklers_pi
         Aeris.h
         DarkSky.cpp
         DarkSky.h
+		Homeauto.cpp
+		Homeauto.h
         web.cpp
         web.h
         json.hpp)

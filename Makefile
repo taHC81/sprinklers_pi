@@ -14,6 +14,7 @@ Weather.cpp \
 Wunderground.cpp \
 Aeris.cpp \
 DarkSky.cpp \
+Homeauto.cpp \
 core.cpp \
 port.cpp \
 settings.cpp \
