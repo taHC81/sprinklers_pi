@@ -16,6 +16,7 @@ class Homeauto : public Weather
 public:
 	Homeauto(void);
 private:
+	const char* homeautoHost;
 	Weather::ReturnVals InternalGetVals(const Weather::Settings & settings) const;
 };
 
