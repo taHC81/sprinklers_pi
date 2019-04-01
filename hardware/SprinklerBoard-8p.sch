@@ -3601,26 +3601,38 @@ ULN and UDN Series&lt;p&gt;
 </sheet>
 </sheets>
 <errors>
-<approved hash="104,1,52.07,129.54,AP1501,HS,GND,,,"/>
-<approved hash="106,1,15.24,73.66,D0,,,,,"/>
-<approved hash="106,1,15.24,81.28,D9,,,,,"/>
-<approved hash="106,1,22.86,58.42,D10,,,,,"/>
-<approved hash="106,1,22.86,55.88,D11,,,,,"/>
-<approved hash="106,1,15.24,63.5,D12,,,,,"/>
-<approved hash="106,1,15.24,60.96,D13,,,,,"/>
-<approved hash="106,1,15.24,58.42,D14,,,,,"/>
-<approved hash="106,1,22.86,78.74,D15,,,,,"/>
-<approved hash="106,1,22.86,76.2,D16,,,,,"/>
-<approved hash="110,1,62.23,137.16,N$8,VIN_PRE,,,,"/>
-<approved hash="111,1,62.23,137.16,N$8,,,,,"/>
-<approved hash="113,1,104.744,107.188,COM,,,,,"/>
-<approved hash="113,1,103.547,92.71,S12,,,,,"/>
-<approved hash="113,1,103.547,72.39,S34,,,,,"/>
-<approved hash="113,1,103.547,52.07,S56,,,,,"/>
-<approved hash="113,1,103.547,31.75,S78,,,,,"/>
-<approved hash="113,1,108.272,138.43,LED,,,,,"/>
-<approved hash="113,1,91.44,143.171,F2,,,,,"/>
-<approved hash="113,1,19.0077,72.5212,OPI-ZERO,,,,,"/>
+<approved hash="202,1,53.34,78.74,IC1,I7,,,,"/>
+<approved hash="106,1,63.5,137.16,3.3V-1,,,,,"/>
+<approved hash="106,1,63.5,116.84,3.3V-2,,,,,"/>
+<approved hash="106,1,63.5,124.46,D0,,,,,"/>
+<approved hash="106,1,63.5,129.54,D7,,,,,"/>
+<approved hash="106,1,63.5,134.62,D8,,,,,"/>
+<approved hash="106,1,63.5,132.08,D9,,,,,"/>
+<approved hash="106,1,71.12,109.22,D10,,,,,"/>
+<approved hash="106,1,63.5,114.3,D12,,,,,"/>
+<approved hash="106,1,63.5,111.76,D13,,,,,"/>
+<approved hash="106,1,63.5,109.22,D14,,,,,"/>
+<approved hash="106,1,71.12,129.54,D15,,,,,"/>
+<approved hash="106,1,71.12,127,D16,,,,,"/>
+<approved hash="106,1,71.12,114.3,GND-2,,,,,"/>
+<approved hash="113,1,131.414,107.188,COM,,,,,"/>
+<approved hash="113,1,130.217,92.71,S12,,,,,"/>
+<approved hash="113,1,130.217,87.63,S34,,,,,"/>
+<approved hash="113,1,130.217,82.55,S56,,,,,"/>
+<approved hash="113,1,68.1517,123.321,NANOPI-NEO,,,,,"/>
+<approved hash="113,1,131.53,120.65,ACIN,,,,,"/>
+<approved hash="113,1,116.84,94.9748,R2,,,,,"/>
+<approved hash="113,1,116.84,92.4348,R3,,,,,"/>
+<approved hash="113,1,116.84,89.8948,R4,,,,,"/>
+<approved hash="113,1,116.84,87.3548,R5,,,,,"/>
+<approved hash="113,1,116.84,84.8148,R6,,,,,"/>
+<approved hash="113,1,116.84,82.2748,R7,,,,,"/>
+<approved hash="113,1,88.9,94.9748,R1,,,,,"/>
+<approved hash="113,1,88.9,92.4348,R8,,,,,"/>
+<approved hash="113,1,88.9,89.8948,R9,,,,,"/>
+<approved hash="113,1,88.9,87.3548,R10,,,,,"/>
+<approved hash="113,1,88.9,84.8148,R11,,,,,"/>
+<approved hash="113,1,88.9,82.2748,R12,,,,,"/>
 </errors>
 </schematic>
 </drawing>
