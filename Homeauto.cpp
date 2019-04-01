@@ -6,7 +6,7 @@
 //
 
 #include "config.h"
-#ifdef HA
+#ifdef HOMEAUTO
 
 #include "Homeauto.h"
 #include "core.h"
@@ -177,25 +177,25 @@ static void ParseResponse(EthernetClient & client, Weather::ReturnVals * ret)
 	} // while (true)
 }
 
-Weather::ReturnVals Wunderground::InternalGetVals(const Weather::Settings & settings) const
+Weather::ReturnVals Homeauto::InternalGetVals(const Weather::Settings & settings) const
 {
 	ReturnVals vals = {0};
 	EthernetClient client;
 
-	//trace("Settings:\nKey: %s\nPWS: %s\nZIP: %ld\nUse PWS: %d\n", settings.key, settings.pws, settings.zip, settings.usePws);
+	trace("Settings:\nKey: %s\nPWS: %s\nZIP: %ld\nUse PWS: %d\n", settings.key, settings.pws, settings.zip, settings.usePws);
 
 	if (client.connect(homeautoHost, 80))
 	{
 		char getstring[255];
 		trace(F("Connected\n"));
-		snprintf(getstring, sizeof(getstring), "GET http://%s/92003.json HTTP/1.1\r\n",homeautoHost);
+		snprintf(getstring, sizeof(getstring), "GET https://%s/92003.php HTTP/1.1\r\n", homeautoHost);
 
-		//trace("GetString: %s\n",getstring);
+		trace("GetString: %s\n",getstring);
 		client.write((uint8_t*) getstring, strlen(getstring));
 		
 		//send host header
 		snprintf(getstring, sizeof(getstring), "Host: %s\r\nConnection: close\r\n\r\n",homeautoHost);
-		//trace("GetString: %s\n",getstring);
+		trace("GetString: %s\n",getstring);
 		client.write((uint8_t*) getstring, strlen(getstring));
 
 		ParseResponse(client, &vals);

@@ -5,8 +5,8 @@
 // Copyright (c) 2019 Tomas Antal
 //
 
-#ifndef _HA_h
-#define _HA_h
+#ifndef _HOMEAUTO_h
+#define _HOMEAUTO_h
 
 #include "port.h"
 #include "Weather.h"
@@ -17,7 +17,7 @@ public:
 	Homeauto(void);
 private:
 	const char* homeautoHost;
-	Weather::ReturnVals InternalGetVals(const Weather::Settings & settings) const;
+Weather::ReturnVals InternalGetVals(const Weather::Settings & settings) const;
 };
 
 #endif

@@ -16,7 +16,7 @@
 #include "Aeris.h"
 #elif defined(WEATHER_DARKSKY)
 #include "DarkSky.h"
-#elif defined(HA)
+#elif defined(HOMEAUTO)
 #include "Homeauto.h"
 #else
 #include "Weather.h"
@@ -258,9 +258,11 @@ static void JSONSettings(const KVPairs & key_value_pairs, FILE * stream_file)
 	fprintf_P(stream_file, PSTR("\t\"apisecret\" : \"%s\",\n"), settings.apiSecret);
 	fprintf_P(stream_file, PSTR("\t\"loc\" : \"%s\",\n"), settings.location);
 #endif
-#if defined(HA)
-	fprintf_P(stream_file, PSTR("\t\"apisecret\" : \"%s\",\n"), settings.apiSecret);
-	fprintf_P(stream_file, PSTR("\t\"loc\" : \"%s\",\n"), settings.location);
+#if defined(HOMEAUTO)
+	fprintf_P(stream_file, PSTR("\t\"apikey\" : \"%s\",\n"), settings.key);
+	fprintf_P(stream_file, PSTR("\t\"wutype\" : \"%s\",\n"), settings.usePws ? "pws" : "zip");
+	fprintf_P(stream_file, PSTR("\t\"zip\" : \"%ld\",\n"), (long) settings.zip);
+	fprintf_P(stream_file, PSTR("\t\"pws\" : \"%s\",\n"), settings.pws);
 #endif
 	// leave this value last, it has no comma after the value
 	fprintf_P(stream_file, PSTR("\t\"sadj\" : \"%ld\"\n"), (long) GetSeasonalAdjust());
@@ -278,7 +280,7 @@ static void JSONwCheck(const KVPairs & key_value_pairs, FILE * stream_file)
 	Aeris w;
 #elif defined(WEATHER_DARKSKY)
 	DarkSky w;
-#elif defined(HA)
+#elif defined(HOMEAUTO)
 	Homeauto w;
 #else
 	Weather w;

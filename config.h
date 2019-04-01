@@ -28,7 +28,7 @@
 // DarkSky Weather https://darksky.net/dev
 //#define WEATHER_DARKSKY
 
-#define HA
+#define HOMEAUTO
 
 // END WEATHER PROVIDER SECTION
 
