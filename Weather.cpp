@@ -44,7 +44,7 @@ int16_t Weather::GetScale(const ReturnVals & vals) const
 	const int humid_factor = NEUTRAL_HUMIDITY - (vals.maxhumidity + vals.minhumidity) / 2;
 	const int temp_factor = (vals.meantempi - 70) * 4;
 	const int rain_factor = (vals.precipi + vals.precip_today) * -2;
-	const int16_t adj = (uint16_t)spi_min(spi_max(0, 100+humid_factor+temp_factor+rain_factor), 200);
+	int16_t adj = (uint16_t)spi_min(spi_max(0, 100+humid_factor+temp_factor+rain_factor), 200);
 	trace(F("Adjusting H(%d)T(%d)R(%d):%d\n"), humid_factor, temp_factor, rain_factor, adj);
 	if (vals.wind_ms_5min_avg > 3) adj = 0;
 	return adj;
