@@ -34,6 +34,7 @@ public:
 		// Today's Values
 		short precip_today;
 		short UV;
+		short wind_ms_5min_avg;
 	};
 	struct Settings
 	{

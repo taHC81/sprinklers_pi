@@ -155,6 +155,10 @@ static void ParseResponse(EthernetClient & client, Weather::ReturnVals * ret)
 				{
 					ret->windmph = (atof(val) * 10.0);
 				}
+				else if (strcmp(key, "wind_ms_5min_avg") == 0)
+				{
+					ret->wind_ms_5min_avg = (atof(val) * 10.0);
+				}
 				else if (strcmp(key, "type") == 0)
 				{
 					if (strcmp(val, "keynotfound") == 0)
