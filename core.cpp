@@ -49,7 +49,11 @@ void runStateClass::LogSchedule()
 {
 #ifdef LOGGING
 	if ((m_eventTime > 0) && (m_zone >= 0))
-		logger.LogZoneEvent(m_eventTime, m_zone, nntpTimeServer.LocalNow() - m_eventTime, m_bSchedule ? m_iSchedule+1:-1, m_adj.seasonal, m_adj.wunderground);
+	{	
+		int schedule_ID = m_bSchedule ? m_iSchedule+1:-1;
+		if (m_adj.wunderground == 0) schedule_ID = -2;
+		logger.LogZoneEvent(m_eventTime, m_zone, nntpTimeServer.LocalNow() - m_eventTime, schedule_ID, m_adj.seasonal, m_adj.wunderground);
+	}
 #endif
 }
 

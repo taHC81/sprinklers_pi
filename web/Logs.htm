@@ -156,9 +156,7 @@
                 if (entry.schedule == -1)
                   tbl_html += "<td>M</td>";
                 else if (entry.schedule == -2)
-                  tbl_html += "<td title=\"Windy\">W</td>";
-                else if (entry.schedule == -3)
-                  tbl_html += "<td title=\"Skipped due to WeatherAdjust\">S</td>";
+                  tbl_html += "<td bgcolor='#FFD0D0' title=\"Skipped due to WeatherAdjust\">WA</td>";
                 else if (entry.schedule == 100)
                   tbl_html += "<td>Q</td>";
                 else
