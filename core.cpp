@@ -55,6 +55,7 @@ void runStateClass::LogSchedule()
 
 void runStateClass::SetSchedule(bool val, int8_t iSched, const runStateClass::DurationAdjustments * adj)
 {
+	trace(F("Running SetSchedule...\n"));
 	LogSchedule();
 	m_bSchedule = val;
 	m_bManual = false;
@@ -67,6 +68,7 @@ void runStateClass::SetSchedule(bool val, int8_t iSched, const runStateClass::Du
 
 void runStateClass::ContinueSchedule(int8_t zone, short endTime)
 {
+	trace(F("Running ContinueSchedule...\n"));
 	LogSchedule();
 	m_bSchedule = true;
 	m_bManual = false;
