@@ -253,7 +253,8 @@ static runStateClass::DurationAdjustments AdjustDurations(Schedule * sched)
 		{
 			adj.wunderground = 0;
 			sched->windy = true;
-		} else
+		}
+		else
 		{
 			adj.wunderground = w.GetScale();
 			sched->windy = false;
