@@ -38,5 +38,7 @@
 // Number of on/off cycles to execute per button press
 #define CHATTERBOX_CYCLES 10
 
+#define WIND_THRESHOLD 3
+// cancel watering if windspeed is more than 3m/s 
 
 #endif //SPRINKLERS_PI_CONFIG_H

@@ -41,10 +41,9 @@ int16_t Weather::GetScale(const ReturnVals & vals) const
 {
 	if (!vals.valid)
 		return 100;
-	if (vals.wind_ms_5min_avg > 3)
+	if (vals.wind_ms_5min_avg > WIND_THRESHOLD)
 	{
-		//logger.LogZoneEvent(nntpTimeServer.LocalNow(), m_zone, 0, -2, -1, -1);
-		return 0;
+		return -2;
 	}
 	const int humid_factor = NEUTRAL_HUMIDITY - (vals.maxhumidity + vals.minhumidity) / 2;
 	const int temp_factor = (vals.meantempi - 70) * 4;
