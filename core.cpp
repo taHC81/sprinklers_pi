@@ -49,17 +49,12 @@ void runStateClass::LogSchedule()
 {
 #ifdef LOGGING
 	if ((m_eventTime > 0) && (m_zone >= 0))
-	{	
-		int schedule_ID = m_bSchedule ? m_iSchedule+1:-1;
-		if (m_adj.wunderground == 0) schedule_ID = -2;
-		logger.LogZoneEvent(m_eventTime, m_zone, nntpTimeServer.LocalNow() - m_eventTime, schedule_ID, m_adj.seasonal, m_adj.wunderground);
-	}
+		logger.LogZoneEvent(m_eventTime, m_zone, nntpTimeServer.LocalNow() - m_eventTime, m_bSchedule ? m_iSchedule+1:-1, m_adj.seasonal, m_adj.wunderground);
 #endif
 }
 
 void runStateClass::SetSchedule(bool val, int8_t iSched, const runStateClass::DurationAdjustments * adj)
 {
-	trace(F("Running SetSchedule...\n"));
 	LogSchedule();
 	m_bSchedule = val;
 	m_bManual = false;
@@ -72,7 +67,6 @@ void runStateClass::SetSchedule(bool val, int8_t iSched, const runStateClass::Du
 
 void runStateClass::ContinueSchedule(int8_t zone, short endTime)
 {
-	trace(F("Running ContinueSchedule...\n"));
 	LogSchedule();
 	m_bSchedule = true;
 	m_bManual = false;
@@ -256,12 +250,10 @@ static runStateClass::DurationAdjustments AdjustDurations(Schedule * sched)
 		if (w.GetScale() == -2)
 		{
 			adj.wunderground = 0;
-			sched->windy = true;
 		}
 		else
 		{
 			adj.wunderground = w.GetScale();
-			sched->windy = false;
 		}
 	}
 	adj.seasonal = GetSeasonalAdjust();
