@@ -233,7 +233,6 @@ void TurnOnZone(int iValve)
 static runStateClass::DurationAdjustments AdjustDurations(Schedule * sched)
 {
 	runStateClass::DurationAdjustments adj(100);
-	bool windy = false;
 	if (sched->IsWAdj()) {
 #if defined(WEATHER_WUNDERGROUND)
 		Wunderground w;
@@ -250,22 +249,18 @@ static runStateClass::DurationAdjustments AdjustDurations(Schedule * sched)
 		// get factor to adjust times by.  100 = 100% (i.e. no adjustment)
 		if (w.GetScale() == -2)
 		{
-			windy = true;
 			adj.wunderground = 0;
+			sched->windy = true;
 		} else
 		{
 			adj.wunderground = w.GetScale();
+			sched->windy = false;
 		}
 	}
 	adj.seasonal = GetSeasonalAdjust();
 	long scale = ((long)adj.seasonal * (long)adj.wunderground) / 100;
 	for (uint8_t k = 0; k < NUM_ZONES; k++)
-	{	
-		uint8_t duration = (uint8_t)spi_min(((long)sched->zone_duration[k] * scale + 50) / 100, 254);
-		windy ? sched->zone_duration[k] = 1 : sched->zone_duration[k] = duration;
-		trace(F("Zone %d : calculated duration %d\n"), k, duration);
-		//logger.LogZoneEvent(nntpTimeServer.LocalNow(), m_zone, 0, -2, -1, -1);
-	}
+		sched->zone_duration[k] = (uint8_t)spi_min(((long)sched->zone_duration[k] * scale + 50) / 100, 254);
 	return adj;
 }
 
@@ -302,7 +297,8 @@ void LoadSchedTimeEvents(uint8_t sched_num, bool bQuickSchedule)
 	{
 		ShortZone zone;
 		LoadShortZone(k, &zone);
-		if (zone.bEnabled && (sched.zone_duration[k] > 0))
+		//if (zone.bEnabled && (sched.zone_duration[k] > 0))
+		if (zone.bEnabled)
 		{
 			if (iNumEvents >= MAX_EVENTS - 1)
 			{  // make sure we have room for the on && the off events.. hence the -1

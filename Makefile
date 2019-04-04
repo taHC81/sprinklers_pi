@@ -11,9 +11,6 @@ CPP_SRCS += \
 Event.cpp \
 Logging.cpp \
 Weather.cpp \
-Wunderground.cpp \
-Aeris.cpp \
-DarkSky.cpp \
 Homeauto.cpp \
 core.cpp \
 port.cpp \

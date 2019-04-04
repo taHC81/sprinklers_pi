@@ -73,6 +73,7 @@ public:
 	short time[4];
 	uint8_t zone_duration[15];
 	Schedule();
+	bool windy;
 	bool IsEnabled() const { return m_type & 0x01; }
 	bool IsInterval() const { return m_type & 0x02; }
 	bool IsWAdj() const { return m_type & 0x04; }
