@@ -35,7 +35,7 @@
                         wuText.append("<h3>Today's Values</h3>");
                         wuText.append("Precipitation: " + data.precip_today / 100 + "\" / " + (data.precip_today * 0.254).toFixed(2) + " mm");
                         wuText.append("<br/>UV: " + data.UV / 10 + " ");
-                        wuText.append("<br/>Wind 5min avg: " + data.wind_ms_5min_avg / 10 + " ms / "+ data.wind_ms_5min_avg * 0.36 + " kmh");
+                        wuText.append("<br/>Wind 5min avg: " + data.wind_ms_5min_avg / 10 + " ms / "+ (data.wind_ms_5min_avg * 0.36).toFixed(2) + " kmh");
                     }
                 }}); // ajax
         }); // on pagebeforeshow handler
