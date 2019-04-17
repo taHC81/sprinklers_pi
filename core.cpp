@@ -247,7 +247,7 @@ static runStateClass::DurationAdjustments AdjustDurations(Schedule * sched)
 		Weather w;
 #endif
 		// get factor to adjust times by.  100 = 100% (i.e. no adjustment)
-		if (w.GetScale() == -2)
+		if (w.GetScale() == -2)		// -2 stands for windy -> skipping irrigation
 		{
 			adj.wunderground = 0;
 		}
@@ -296,8 +296,8 @@ void LoadSchedTimeEvents(uint8_t sched_num, bool bQuickSchedule)
 	{
 		ShortZone zone;
 		LoadShortZone(k, &zone);
-		//if (zone.bEnabled && (sched.zone_duration[k] > 0))
-		if (zone.bEnabled)
+		if (zone.bEnabled && (sched.zone_duration[k] > 0))
+		//if (zone.bEnabled)  run even the empty ones -> to log them into DB
 		{
 			if (iNumEvents >= MAX_EVENTS - 1)
 			{  // make sure we have room for the on && the off events.. hence the -1
