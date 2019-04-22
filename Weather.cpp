@@ -43,7 +43,7 @@ int16_t Weather::GetScale(const ReturnVals & vals) const
 		return 100;
 	if (vals.wind_ms_5min_avg > WIND_THRESHOLD)
 	{
-		return -2;
+		return 0;
 	}
 	const int humid_factor = NEUTRAL_HUMIDITY - (vals.maxhumidity + vals.minhumidity) / 2;
 	const int temp_factor = (vals.meantempi - 70) * 4;
